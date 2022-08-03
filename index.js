@@ -2,9 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs').promises;
 const { validateEmail, validatePassword,
-  generateToken } = require('./helpers/ValidatingFunctions');
+  generateToken, validateToken, validateName, validateAge, validateTalk,
+  validateWatchedAt, validateRate,
+} = require('./helpers/ValidatingFunctions');
 const { DATA_TALKERS, NOT_FOUND_STATUS, LOGIN_ERROR_STATUS,
-  emailNull, pwNull, emailErr, pwErr } = require('./helpers/constants');
+  emailNull, pwNull, emailErr, pwErr, ADD_TALKER_STATUS,
+} = require('./helpers/constants');
 
 const app = express();
 app.use(bodyParser.json());
@@ -17,7 +20,7 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
-app.get('/talker', async (req, res) => {
+app.get('/talker', async (_req, res) => {
   const talks = await fs.readFile(DATA_TALKERS, 'utf8');
   const parsedTalkers = JSON.parse(talks);
   if (parsedTalkers && parsedTalkers.length !== 0) {
@@ -45,6 +48,27 @@ app.post('/login', (req, res) => {
   const token = generateToken();
   return res.status(HTTP_OK_STATUS).json({ token });
 });
+
+app.post('/talker', validateToken, validateName, validateAge, validateTalk,
+  validateWatchedAt, validateRate,
+  async (req, res) => {
+    const { name, age, talk } = req.body;
+    const { watchedAt, rate } = talk;
+    const talkers = await fs.readFile(DATA_TALKERS, 'utf8');
+    const parsedTalkers = JSON.parse(talkers);
+    const TALKER_REQ_05 = {
+      id: parsedTalkers.length + 1,
+      name,
+      age,
+      talk: {
+        watchedAt,
+        rate,
+      },
+    };
+    parsedTalkers.push(TALKER_REQ_05);
+    await fs.writeFile(DATA_TALKERS, JSON.stringify(parsedTalkers));
+    return res.status(ADD_TALKER_STATUS).json(TALKER_REQ_05);
+  });
 
 app.listen(PORT, () => {
   console.log('Online');
