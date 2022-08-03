@@ -68,7 +68,25 @@ app.post('/talker', validateToken, validateName, validateAge, validateTalk,
     parsedTalkers.push(TALKER_REQ_05);
     await fs.writeFile(DATA_TALKERS, JSON.stringify(parsedTalkers));
     return res.status(ADD_TALKER_STATUS).json(TALKER_REQ_05);
-  });
+});
+
+app.put('/talker/:id', validateToken, validateName, validateAge, validateTalk,
+  validateWatchedAt, validateRate, async (req, res) => {
+    const { id } = req.params;
+    const { name, age, talk } = req.body;
+    const { watchedAt, rate } = talk;
+    const talkers = await fs.readFile(DATA_TALKERS, 'utf8');
+    const parsedTalkers = JSON.parse(talkers);
+    const talkerIndex = parsedTalkers.findIndex((talkr) => talkr.id === +id);
+    parsedTalkers[talkerIndex] = {
+      ...parsedTalkers[talkerIndex],
+      name,
+      age,
+      talk: { watchedAt, rate },
+    };
+    await fs.writeFile(DATA_TALKERS, JSON.stringify(parsedTalkers));
+    return res.status(HTTP_OK_STATUS).json(parsedTalkers[talkerIndex]);
+});
 
 app.listen(PORT, () => {
   console.log('Online');
