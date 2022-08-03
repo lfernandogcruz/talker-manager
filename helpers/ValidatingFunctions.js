@@ -54,7 +54,7 @@ const validateWatchedAt = (req, res, next) => {
 
 const validateRate = (req, res, next) => {
   const { talk: { rate } } = req.body;
-  if (!rate) return res.status(LOGIN_ERROR_STATUS).json({ message: rateNull });
+  if (rate === undefined) return res.status(LOGIN_ERROR_STATUS).json({ message: rateNull });
   const isRateValid = +rate >= 1 && +rate <= 5;
   if (!isRateValid) return res.status(LOGIN_ERROR_STATUS).json({ message: rateErr });
   next();
