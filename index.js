@@ -20,6 +20,15 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
+app.get('/talker/search?', validateToken, async (req, res) => {
+  const { q } = req.query;
+  const talkers = await fs.readFile(DATA_TALKERS, 'utf8');
+  const parsedTalkers = JSON.parse(talkers);
+  if (!q) return res.status(HTTP_OK_STATUS).json(parsedTalkers);
+  const filteredTalkers = parsedTalkers.filter((talkr) => talkr.name.includes(q));
+  return res.status(HTTP_OK_STATUS).json(filteredTalkers);
+});
+
 app.get('/talker', async (_req, res) => {
   const talks = await fs.readFile(DATA_TALKERS, 'utf8');
   const parsedTalkers = JSON.parse(talks);
