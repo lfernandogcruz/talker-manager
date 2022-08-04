@@ -88,6 +88,16 @@ app.put('/talker/:id', validateToken, validateName, validateAge, validateTalk,
     return res.status(HTTP_OK_STATUS).json(parsedTalkers[talkerIndex]);
 });
 
+app.delete('/talker/:id', validateToken, async (req, res) => {
+  const { id } = req.params;
+  const talkers = await fs.readFile(DATA_TALKERS, 'utf8');
+  const parsedTalkers = JSON.parse(talkers);
+  const talkerIndex = parsedTalkers.findIndex((talkr) => talkr.id === +id);
+  parsedTalkers.splice(talkerIndex, 1);
+  await fs.writeFile(DATA_TALKERS, JSON.stringify(parsedTalkers));
+  return res.status(204).end();
+});
+
 app.listen(PORT, () => {
   console.log('Online');
 });
