@@ -101,9 +101,10 @@ app.delete('/talker/:id', validateToken, async (req, res) => {
   const { id } = req.params;
   const talkers = await fs.readFile(DATA_TALKERS, 'utf8');
   const parsedTalkers = JSON.parse(talkers);
-  const talkerIndex = parsedTalkers.findIndex((talkr) => talkr.id === +id);
-  parsedTalkers.splice(talkerIndex, 1);
-  await fs.writeFile(DATA_TALKERS, JSON.stringify(parsedTalkers));
+  const talkerIndex = parsedTalkers.filter((talkr) => talkr.id !== +id);
+  // const talkerIndex = parsedTalkers.findIndex((talkr) => talkr.id === +id);
+  // parsedTalkers.splice(talkerIndex, 1);
+  await fs.writeFile(DATA_TALKERS, JSON.stringify(talkerIndex));
   return res.status(204).end();
 });
 
