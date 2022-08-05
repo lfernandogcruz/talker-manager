@@ -46,7 +46,6 @@ const validateTalk = (req, res, next) => {
 const validateWatchedAt = (req, res, next) => {
   const { talk: { watchedAt } } = req.body;
   if (!watchedAt) return res.status(LOGIN_ERROR_STATUS).json({ message: watchedAtNull });
-  // const dateReg = /^\d{2}[/]\d{2}[/]\d{4}$/;
   const dateReg = /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/i;
   const isDateValid = dateReg.test(watchedAt);
   if (!isDateValid) return res.status(LOGIN_ERROR_STATUS).json({ message: watchedAtErr });
